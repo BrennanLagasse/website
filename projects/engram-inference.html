@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fast inference for DeepSeek Engrams · Brennan Lagasse</title>
+<meta name="description" content="An open-source implementation of the DeepSeek Engram architecture, with a scheduler and memory allocator for 44x faster sharded inference.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/theme.js"></script>
+</head>
+<body class="article-page">
+
+<canvas id="field" aria-hidden="true"></canvas>
+
+<div class="site">
+  <header class="nav">
+    <a class="wordmark" href="../index.html">Brennan Lagasse <small>AI/ML Research Engineer</small></a>
+    <div class="nav-right">
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="../research.html">Research</a></li>
+          <li><a href="../projects.html" aria-current="page">Projects</a></li>
+          <li><a href="../notes.html">Notes</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">
+        <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="sheet">
+  <main class="column">
+    <article>
+      <p class="eyebrow">Project · ML systems</p>
+      <h1>Fast inference for DeepSeek Engrams</h1>
+      <p class="dek">An open-source implementation of the Engram architecture, and the scheduling and memory work that made it practical to serve.</p>
+      <div class="meta">
+        <time datetime="2026-09-14">14 Sep 2026</time>
+        <span>PyTorch · CUDA · Distributed inference</span>
+        <!-- TODO: point this at the project repo -->
+        <a href="https://github.com/BrennanLagasse">Code</a>
+      </div>
+
+      <div class="figures">
+        <div class="figure"><b>44×</b><span>inference speedup, sharded across GPUs</span></div>
+        <div class="figure"><b>1st</b><span>open-source Engram implementation</span></div>
+        <div class="figure"><b>mHC · MoE · MHA</b><span>components implemented</span></div>
+      </div>
+
+      <div class="prose">
+        <h2>The problem</h2>
+        <p>DeepSeek's Engram architecture adds a module to the transformer that looks up stored memory instead of recomputing it. When I started, there was no public implementation. A straightforward one is also slow: on a large model sharded across GPUs, the Engram module spends most of its time waiting on memory movement.</p>
+
+        <h2>What I built</h2>
+        <p>First, a complete open-source implementation of the architecture, including manifold-constrained hyper-connections (mHC), mixture-of-experts layers and multi-head attention. Then two systems pieces aimed at the Engram module's cost:</p>
+        <ul>
+          <li><b>A scheduler</b> that overlaps Engram lookups with the rest of the forward pass, so GPUs aren't idle while memory is fetched.</li>
+          <li><b>A custom CPU/GPU memory allocator</b> that decides which Engram tables live in GPU memory and which stay in host memory, to keep transfers off the critical path.</li>
+        </ul>
+        <p>Together these made inference 44× faster than the baseline implementation on the same sharded setup.</p>
+
+        <p class="callout">The full report covers the benchmark setup, ablations for each optimization, and where the remaining time goes.</p>
+      </div>
+    </article>
+    <a class="back" href="../projects.html">← All projects</a>
+  </main>
+
+  <footer class="contact" aria-label="Contact">
+    <span class="contact-label">Get in touch</span>
+    <ul>
+      <li><a href="https://github.com/BrennanLagasse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>GitHub</a></li>
+      <li><a href="https://scholar.google.com/citations?hl=en&amp;user=bope0coAAAAJ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/></svg>Scholar</a></li>
+      <li><a href="https://www.linkedin.com/in/brennan-lagasse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M8 10.5V17M8 7.2v.1M12 17v-6.5M12 13.5c0-2 1.3-3 2.7-3s2.3 1 2.3 3V17"/></svg>LinkedIn</a></li>
+      <li><a href="mailto:brennan.lagasse@yale.edu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>Email</a></li>
+    </ul>
+  </footer>
+  </div>
+</div>
+
+<script src="../assets/basins.js"></script>
+</body>
+</html>

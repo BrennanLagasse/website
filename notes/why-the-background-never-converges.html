@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why the background never converges · Brennan Lagasse</title>
+<meta name="description" content="Momentum, AdamW and Muon descend a loss surface that keeps moving underneath them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/theme.js"></script>
+</head>
+<body class="article-page">
+
+<canvas id="field" aria-hidden="true"></canvas>
+
+<div class="site">
+  <header class="nav">
+    <a class="wordmark" href="../index.html">Brennan Lagasse <small>AI/ML Research Engineer</small></a>
+    <div class="nav-right">
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="../research.html">Research</a></li>
+          <li><a href="../projects.html">Projects</a></li>
+          <li><a href="../notes.html" aria-current="page">Notes</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">
+        <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+        <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="sheet">
+  <main class="column">
+    <article>
+      <p class="eyebrow">Note · Optimization</p>
+      <h1>Why the background never converges</h1>
+      <p class="dek">Several hundred optimizers descend a loss surface that keeps moving underneath them.</p>
+      <div class="meta">
+        <time datetime="2026-11-10">10 Nov 2026</time>
+        <span>4 min read</span>
+      </div>
+
+      <div class="prose">
+        <p>Each point behind this text is a two-parameter model trained on noisy gradients by one of three optimizers: momentum gradient descent, AdamW or Muon. The surface is a shallow bowl with seven wells and two ridges cut into it. Every well drifts, deepens and fades on its own slow clock.</p>
+
+        <p>Because the objective is non-stationary, convergence is only ever temporary. Points settle into a basin, then the basin shallows or merges with a neighbor, and they spill over the saddle toward whatever is deepest now.</p>
+
+        <div class="legend">
+          <div><span class="sw minor"></span><span>Contour, interval <span class="k">0.075</span> loss units</span></div>
+          <div><span class="sw major"></span><span>Index contour, every fifth line, as on a topographic survey map</span></div>
+          <div><span class="dots"><i class="dot mom"></i><i class="dot adam"></i><i class="dot muon"></i></span><span>Momentum GD, AdamW and Muon, still travelling</span></div>
+          <div><span class="dots"><i class="dot rest"></i></span><span>Any optimizer at rest in a basin</span></div>
+        </div>
+
+        <h2>Three ways down a hill</h2>
+        <p>The optimizers handle the moving target differently. <b>Momentum</b> accelerates down steep walls and overshoots; when a basin moves, it carries its velocity past the new minimum before turning back. <b>AdamW</b> takes steps of roughly fixed size per coordinate, so it moves at the same pace on gentle and steep slopes, and its weight decay pulls each point toward the origin. <b>Muon</b>'s steps have a fixed length, so it crosses flat plateaus as quickly as steep slopes.</p>
+
+        <p>With only two parameters, Muon's orthogonalization reduces to normalizing the update: <span class="k">orth(x) = x / ‖x‖</span>. That makes it the easiest of the three to reason about here. It also means Muon points never quite stop: they jitter back and forth across the bottom of a basin, in steps whose length is set by the learning rate.</p>
+
+        <h2>What to look for</h2>
+        <p>Watch the grey points. They have stopped moving for the moment, so they are the closest thing this system has to a converged model. When a basin starts to fade, the momentum points carry the most speed out of it. AdamW points settle slightly off the true bottom of each well, displaced toward the center of the screen. That offset is the weight decay: it adds a constant pull toward the origin, so the resting point balances the gradient against it.</p>
+
+        <p class="callout">Click anywhere on the background outside this column to drop a cluster of new points. To change the optimizer, drift rate, learning rate or noise, open the <a href="../prototypes/drifting-basins.html">full interactive version</a>.</p>
+      </div>
+    </article>
+    <a class="back" href="../notes.html">← All notes</a>
+  </main>
+
+  <footer class="contact" aria-label="Contact">
+    <span class="contact-label">Get in touch</span>
+    <ul>
+      <li><a href="https://github.com/BrennanLagasse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>GitHub</a></li>
+      <li><a href="https://scholar.google.com/citations?hl=en&amp;user=bope0coAAAAJ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/></svg>Scholar</a></li>
+      <li><a href="https://www.linkedin.com/in/brennan-lagasse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M8 10.5V17M8 7.2v.1M12 17v-6.5M12 13.5c0-2 1.3-3 2.7-3s2.3 1 2.3 3V17"/></svg>LinkedIn</a></li>
+      <li><a href="mailto:brennan.lagasse@yale.edu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>Email</a></li>
+    </ul>
+  </footer>
+  </div>
+</div>
+
+<script src="../assets/basins.js"></script>
+</body>
+</html>
